@@ -1,10 +1,17 @@
 package app
 
 import (
+	"database/sql"
 	"log/slog"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/modaniru/moex-telegram-bot/config"
+	"github.com/modaniru/moex-telegram-bot/internal/bot"
+	"github.com/modaniru/moex-telegram-bot/internal/handler"
+	"github.com/modaniru/moex-telegram-bot/internal/service"
+	"github.com/modaniru/moex-telegram-bot/internal/storage"
+	"github.com/modaniru/moex-telegram-bot/internal/storage/gen"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -13,23 +20,25 @@ import (
 func App() {
 	cfg := config.LoadConfig()
 	ConfigureLogger(cfg.Level)
-	bot, err := tgbotapi.NewBotAPI(cfg.Token)
+	slog.Info("create bot api...")
+	botApi, err := tgbotapi.NewBotAPI(cfg.Token)
 	if err != nil {
 		slog.Error("create bot api error", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-
-	slog.Info("Authorized on account %s", bot.Self.UserName)
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message.Text == "kek" {
-			m := tgbotapi.NewMessage(update.Message.From.ID, "lol")
-			bot.Send(m)
-		}
+	slog.Info("Authorized on account " + botApi.Self.UserName)
+	slog.Info("create handler...")
+	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:1111/postgres?sslmode=disable")
+	if err != nil {
+		slog.Error("open db error", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
+	q := gen.New(db)
+	storage := storage.NewStorage(db, q)
+	service := service.NewService(storage)
+	handler := handler.NewHandler(botApi, service)
+	slog.Info("handler created")
+	botServer := bot.NewBot(botApi, handler)
+	botServer.Start()
+	slog.Error("bot was not up")
 }
