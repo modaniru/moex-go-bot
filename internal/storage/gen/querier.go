@@ -4,12 +4,20 @@ package gen
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Querier interface {
 	CreateUser(ctx context.Context, id int32) error
+	DeleteTrackByUserIdAndId(ctx context.Context, arg DeleteTrackByUserIdAndIdParams) error
 	DeleteUser(ctx context.Context, id int32) error
+	Follow(ctx context.Context, id int32) error
 	GetUser(ctx context.Context, id int32) (User, error)
+	GetUserTracks(ctx context.Context, userID sql.NullInt32) ([]Track, error)
+	SaveTrack(ctx context.Context, arg SaveTrackParams) error
+	TrackSecurityByUserIdAndId(ctx context.Context, arg TrackSecurityByUserIdAndIdParams) error
+	Unfollow(ctx context.Context, id int32) error
+	UntrackSecurityByUserIdAndId(ctx context.Context, arg UntrackSecurityByUserIdAndIdParams) error
 }
 
 var _ Querier = (*Queries)(nil)

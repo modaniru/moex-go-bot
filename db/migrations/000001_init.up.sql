@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id int primary key not NULL,
     banned boolean default false not null,
-    followed boolean default true
+    followed boolean default true not null
 );
 
 CREATE TABLE track (
@@ -12,5 +12,6 @@ CREATE TABLE track (
     board_group int not null,
     security varchar not null,
     tracked_volume int not null,
-    isTracked boolean default true
+    date varchar not null,
+    is_tracked boolean default true
 );

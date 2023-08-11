@@ -25,6 +25,15 @@ func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
 	return err
 }
 
+const follow = `-- name: Follow :exec
+update users set followed = true where id = $1 and followed = false
+`
+
+func (q *Queries) Follow(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, follow, id)
+	return err
+}
+
 const getUser = `-- name: GetUser :one
 select id, banned, followed from users where id = $1 limit 1
 `
@@ -34,4 +43,13 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 	var i User
 	err := row.Scan(&i.ID, &i.Banned, &i.Followed)
 	return i, err
+}
+
+const unfollow = `-- name: Unfollow :exec
+update users set followed = false where id = $1 and followed = true
+`
+
+func (q *Queries) Unfollow(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, unfollow, id)
+	return err
 }

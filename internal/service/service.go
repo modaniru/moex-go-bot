@@ -10,6 +10,8 @@ type UserService interface {
 	Register(id int) error
 	GetUserById(id int) (gen.User, error)
 	DeleteUserById(id int) error
+	FollowUser(id int) error
+	UnfollowUser(id int) error
 }
 
 type Service struct {

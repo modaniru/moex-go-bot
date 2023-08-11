@@ -14,11 +14,12 @@ type Track struct {
 	BoardGroup    int32
 	Security      string
 	TrackedVolume int32
-	Istracked     sql.NullBool
+	Date          string
+	IsTracked     sql.NullBool
 }
 
 type User struct {
 	ID       int32
 	Banned   bool
-	Followed sql.NullBool
+	Followed bool
 }
