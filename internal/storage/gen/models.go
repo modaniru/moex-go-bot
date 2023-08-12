@@ -8,8 +8,8 @@ import (
 
 type Track struct {
 	ID            sql.NullInt32
-	UserID        sql.NullInt32
-	Stock         string
+	UserID        int32
+	Engine        string
 	Market        string
 	BoardGroup    int32
 	Security      string

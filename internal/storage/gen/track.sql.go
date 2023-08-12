@@ -13,7 +13,7 @@ delete from track where user_id = $1 and id = $2
 `
 
 type DeleteTrackByUserIdAndIdParams struct {
-	UserID sql.NullInt32
+	UserID int32
 	ID     sql.NullInt32
 }
 
@@ -23,10 +23,10 @@ func (q *Queries) DeleteTrackByUserIdAndId(ctx context.Context, arg DeleteTrackB
 }
 
 const getUserTracks = `-- name: GetUserTracks :many
-select id, user_id, stock, market, board_group, security, tracked_volume, date, is_tracked from track where user_id = $1
+select id, user_id, engine, market, board_group, security, tracked_volume, date, is_tracked from track where user_id = $1
 `
 
-func (q *Queries) GetUserTracks(ctx context.Context, userID sql.NullInt32) ([]Track, error) {
+func (q *Queries) GetUserTracks(ctx context.Context, userID int32) ([]Track, error) {
 	rows, err := q.db.QueryContext(ctx, getUserTracks, userID)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (q *Queries) GetUserTracks(ctx context.Context, userID sql.NullInt32) ([]Tr
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
-			&i.Stock,
+			&i.Engine,
 			&i.Market,
 			&i.BoardGroup,
 			&i.Security,
@@ -60,14 +60,14 @@ func (q *Queries) GetUserTracks(ctx context.Context, userID sql.NullInt32) ([]Tr
 }
 
 const saveTrack = `-- name: SaveTrack :exec
-insert into track (user_id, stock, market, board_group, security, date, tracked_volume) values (
+insert into track (user_id, engine, market, board_group, security, date, tracked_volume) values (
     $1, $2, $3, $4, $5, $6, $7
 )
 `
 
 type SaveTrackParams struct {
-	UserID        sql.NullInt32
-	Stock         string
+	UserID        int32
+	Engine        string
 	Market        string
 	BoardGroup    int32
 	Security      string
@@ -78,7 +78,7 @@ type SaveTrackParams struct {
 func (q *Queries) SaveTrack(ctx context.Context, arg SaveTrackParams) error {
 	_, err := q.db.ExecContext(ctx, saveTrack,
 		arg.UserID,
-		arg.Stock,
+		arg.Engine,
 		arg.Market,
 		arg.BoardGroup,
 		arg.Security,
@@ -93,7 +93,7 @@ update track set is_tracked = true where user_id = $1 and id = $2
 `
 
 type TrackSecurityByUserIdAndIdParams struct {
-	UserID sql.NullInt32
+	UserID int32
 	ID     sql.NullInt32
 }
 
@@ -107,7 +107,7 @@ update track set is_tracked = false where user_id = $1 and id = $2
 `
 
 type UntrackSecurityByUserIdAndIdParams struct {
-	UserID sql.NullInt32
+	UserID int32
 	ID     sql.NullInt32
 }
 

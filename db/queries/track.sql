@@ -1,5 +1,5 @@
 -- name: SaveTrack :exec
-insert into track (user_id, stock, market, board_group, security, date, tracked_volume) values (
+insert into track (user_id, engine, market, board_group, security, date, tracked_volume) values (
     $1, $2, $3, $4, $5, $6, $7
 );
 -- name: GetUserTracks :many

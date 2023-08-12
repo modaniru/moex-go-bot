@@ -3,11 +3,13 @@ package app
 import (
 	"database/sql"
 	"log/slog"
+	"net/http"
 	"os"
 
 	_ "github.com/lib/pq"
 	"github.com/modaniru/moex-telegram-bot/config"
 	"github.com/modaniru/moex-telegram-bot/internal/bot"
+	"github.com/modaniru/moex-telegram-bot/internal/clients"
 	"github.com/modaniru/moex-telegram-bot/internal/handler"
 	"github.com/modaniru/moex-telegram-bot/internal/service"
 	"github.com/modaniru/moex-telegram-bot/internal/storage"
@@ -34,8 +36,10 @@ func App() {
 		os.Exit(1)
 	}
 	q := gen.New(db)
+	client := http.Client{}
+	moex := clients.NewMoexClient(&client)
 	storage := storage.NewStorage(db, q)
-	service := service.NewService(storage)
+	service := service.NewService(moex, storage)
 	handler := handler.NewHandler(botApi, service)
 	slog.Info("handler created")
 	botServer := bot.NewBot(botApi, handler)

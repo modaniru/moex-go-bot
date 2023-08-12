@@ -34,10 +34,10 @@ func (u *UserService) DeleteUserById(id int) error {
 	return u.storage.DeleteUser(context.Background(), int32(id))
 }
 
-func (u *UserService) FollowUser(id int) error{
+func (u *UserService) FollowUser(id int) error {
 	return u.storage.Follow(context.Background(), int32(id))
 }
 
-func (u *UserService) UnfollowUser(id int) error{
+func (u *UserService) UnfollowUser(id int) error {
 	return u.storage.Unfollow(context.Background(), int32(id))
 }

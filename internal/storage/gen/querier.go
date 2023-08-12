@@ -4,7 +4,6 @@ package gen
 
 import (
 	"context"
-	"database/sql"
 )
 
 type Querier interface {
@@ -13,7 +12,7 @@ type Querier interface {
 	DeleteUser(ctx context.Context, id int32) error
 	Follow(ctx context.Context, id int32) error
 	GetUser(ctx context.Context, id int32) (User, error)
-	GetUserTracks(ctx context.Context, userID sql.NullInt32) ([]Track, error)
+	GetUserTracks(ctx context.Context, userID int32) ([]Track, error)
 	SaveTrack(ctx context.Context, arg SaveTrackParams) error
 	TrackSecurityByUserIdAndId(ctx context.Context, arg TrackSecurityByUserIdAndIdParams) error
 	Unfollow(ctx context.Context, id int32) error

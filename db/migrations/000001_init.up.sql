@@ -6,8 +6,8 @@ CREATE TABLE users (
 
 CREATE TABLE track (
     id serial,
-    user_id int REFERENCES users(id) on delete cascade,
-    stock varchar not null,
+    user_id int not null REFERENCES users(id) on delete cascade,
+    engine varchar not null,
     market varchar not null,
     board_group int not null,
     security varchar not null,

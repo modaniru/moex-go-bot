@@ -1,6 +1,8 @@
 package service
 
 import (
+	"github.com/modaniru/moex-telegram-bot/internal/clients"
+	"github.com/modaniru/moex-telegram-bot/internal/entity"
 	"github.com/modaniru/moex-telegram-bot/internal/service/services"
 	"github.com/modaniru/moex-telegram-bot/internal/storage"
 	"github.com/modaniru/moex-telegram-bot/internal/storage/gen"
@@ -14,12 +16,18 @@ type UserService interface {
 	UnfollowUser(id int) error
 }
 
-type Service struct {
-	UserService
+type TrackService interface {
+	SaveTrack(params *entity.SaveTrack) (*entity.TrackResponse, error)
 }
 
-func NewService(storage *storage.Storage) *Service {
+type Service struct {
+	UserService
+	TrackService
+}
+
+func NewService(moex *clients.MoexClient, storage *storage.Storage) *Service {
 	return &Service{
-		UserService: services.NewUserService(storage),
+		UserService:  services.NewUserService(storage),
+		TrackService: services.NewCandlesService(moex, storage),
 	}
 }

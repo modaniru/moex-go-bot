@@ -17,8 +17,14 @@ func NewHandler(bot *tgbotapi.BotAPI, service *service.Service) *Handler {
 	return &Handler{bot: bot, service: service}
 }
 
+// TODO try to do better router
+// TODO delete account command
+// TODO all text to consts
 func (h *Handler) HandleAction(update tgbotapi.Update) {
 	message := update.Message
+	if message == nil{
+		return
+	}
 	ctx := context.WithValue(context.Background(), "id", message.From.ID)
 	ctx = context.WithValue(ctx, "message", message.Text)
 	command := strings.Split(message.Text, " ")
@@ -30,7 +36,7 @@ func (h *Handler) HandleAction(update tgbotapi.Update) {
 	case "/register":
 		h.Register(message)
 	case "/add":
-		h.AddSecurity(message)
+		h.isValidUser(message, h.AddSecurity)
 	case "/follow":
 		h.isValidUser(message, h.FollowUser)
 	case "/unfollow":
