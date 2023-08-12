@@ -22,6 +22,49 @@ func (q *Queries) DeleteTrackByUserIdAndId(ctx context.Context, arg DeleteTrackB
 	return err
 }
 
+const getAllMustNotifiedTracks = `-- name: GetAllMustNotifiedTracks :many
+select t.engine, t.market, t.board_group, t.security, t.tracked_volume, u.id from track as t inner join users as u on t.user_id = u.id where u.followed = true and u.banned = false and t.is_tracked = true
+`
+
+type GetAllMustNotifiedTracksRow struct {
+	Engine        string
+	Market        string
+	BoardGroup    int32
+	Security      string
+	TrackedVolume int32
+	ID            int32
+}
+
+func (q *Queries) GetAllMustNotifiedTracks(ctx context.Context) ([]GetAllMustNotifiedTracksRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllMustNotifiedTracks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllMustNotifiedTracksRow
+	for rows.Next() {
+		var i GetAllMustNotifiedTracksRow
+		if err := rows.Scan(
+			&i.Engine,
+			&i.Market,
+			&i.BoardGroup,
+			&i.Security,
+			&i.TrackedVolume,
+			&i.ID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserTracks = `-- name: GetUserTracks :many
 select id, user_id, engine, market, board_group, security, tracked_volume, date, is_tracked from track where user_id = $1
 `

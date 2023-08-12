@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/modaniru/moex-telegram-bot/internal/clients"
 	"github.com/modaniru/moex-telegram-bot/internal/entity"
@@ -19,6 +20,7 @@ type TrackStorage interface {
 	TrackSecurityByUserIdAndId(ctx context.Context, arg gen.TrackSecurityByUserIdAndIdParams) error
 	SaveTrack(ctx context.Context, arg gen.SaveTrackParams) error
 	DeleteUser(ctx context.Context, id int32) error
+	GetAllMustNotifiedTracks(ctx context.Context) ([]gen.GetAllMustNotifiedTracksRow, error)
 	DeleteTrackByUserIdAndId(ctx context.Context, arg gen.DeleteTrackByUserIdAndIdParams) error
 	GetUserTracks(ctx context.Context, userID int32) ([]gen.Track, error)
 }
@@ -96,4 +98,54 @@ func (c *CandlesService) SaveTrack(params *entity.SaveTrack) (*entity.TrackRespo
 		MinVolume: int(min),
 		Date: params.Date,
 		}, nil
+}
+
+func (c *CandlesService) GetAllMustNotifiedTracks() ([]gen.GetAllMustNotifiedTracksRow, error){
+	return c.storage.GetAllMustNotifiedTracks(context.Background())
+}
+
+type CandleResponse struct{
+	Open int
+	Close int
+	Volume int
+}
+
+func (c *CandlesService) GetCandle(row gen.GetAllMustNotifiedTracksRow) (*CandleResponse, error){
+	resp, err := c.moexClient.Candles(
+		&clients.CandleRequest{
+			Engine: row.Engine,
+			Market: row.Market,
+			BoardGroupId: int(row.BoardGroup),
+			Security: row.Security,
+			Date: time.Now().Format("2006-01-02"),
+			Interval: 1,
+			IsReverse: true,
+		},
+	)
+	if err != nil{
+		return nil, fmt.Errorf("send request error: %w", err)
+	}
+	if len(resp.Candles.Data) == 0 {
+		return nil, ErrBadDay
+	}
+	// TODO search by columns
+
+	volume, ok := resp.Candles.Data[0][5].(float64)
+	if !ok{
+		return nil, fmt.Errorf("conv value error")
+	}
+	open, ok := resp.Candles.Data[0][0].(float64)
+	if !ok{
+		return nil, fmt.Errorf("conv value error")
+	}
+	close, ok := resp.Candles.Data[0][1].(float64)
+	if !ok{
+		return nil, fmt.Errorf("conv value error")
+	}
+
+	return &CandleResponse{
+		Volume: int(volume),
+		Open: int(open),
+		Close: int(close),
+	}, nil
 }

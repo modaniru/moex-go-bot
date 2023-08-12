@@ -18,6 +18,8 @@ type UserService interface {
 
 type TrackService interface {
 	SaveTrack(params *entity.SaveTrack) (*entity.TrackResponse, error)
+	GetAllMustNotifiedTracks() ([]gen.GetAllMustNotifiedTracksRow, error)
+	GetCandle(row gen.GetAllMustNotifiedTracksRow) (*services.CandleResponse, error)
 }
 
 type Service struct {

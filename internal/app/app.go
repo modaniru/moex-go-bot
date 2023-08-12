@@ -12,6 +12,8 @@ import (
 	"github.com/modaniru/moex-telegram-bot/internal/clients"
 	"github.com/modaniru/moex-telegram-bot/internal/handler"
 	"github.com/modaniru/moex-telegram-bot/internal/service"
+	"github.com/modaniru/moex-telegram-bot/internal/service/notifier"
+	"github.com/modaniru/moex-telegram-bot/internal/service/telegram"
 	"github.com/modaniru/moex-telegram-bot/internal/storage"
 	"github.com/modaniru/moex-telegram-bot/internal/storage/gen"
 
@@ -39,10 +41,13 @@ func App() {
 	client := http.Client{}
 	moex := clients.NewMoexClient(&client)
 	storage := storage.NewStorage(db, q)
-	service := service.NewService(moex, storage)
-	handler := handler.NewHandler(botApi, service)
+	s := service.NewService(moex, storage)
+	handler := handler.NewHandler(botApi, s)
+	sender := telegram.NewMessageSender(botApi)
+	notifier := notifier.NewNotifier(s.TrackService, sender)
 	slog.Info("handler created")
 	botServer := bot.NewBot(botApi, handler)
+	notifier.StartNotifier()
 	botServer.Start()
 	slog.Error("bot was not up")
 }

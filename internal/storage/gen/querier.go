@@ -11,6 +11,7 @@ type Querier interface {
 	DeleteTrackByUserIdAndId(ctx context.Context, arg DeleteTrackByUserIdAndIdParams) error
 	DeleteUser(ctx context.Context, id int32) error
 	Follow(ctx context.Context, id int32) error
+	GetAllMustNotifiedTracks(ctx context.Context) ([]GetAllMustNotifiedTracksRow, error)
 	GetUser(ctx context.Context, id int32) (User, error)
 	GetUserTracks(ctx context.Context, userID int32) ([]Track, error)
 	SaveTrack(ctx context.Context, arg SaveTrackParams) error

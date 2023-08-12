@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	url = "https://iss.moex.com/iss/engines/%s/markets/%s/boardgroups/%d/securities/%s/candles.jsonp?interval=%d&from=%s&till=%s"
+	url = "https://iss.moex.com/iss/engines/%s/markets/%s/boardgroups/%d/securities/%s/candles.jsonp?interval=%d&from=%s&till=%s&iss.reverse=%t"
 )
 
 type MoexClient struct {
@@ -20,7 +20,7 @@ func NewMoexClient(client *http.Client) *MoexClient {
 }
 
 func (m *MoexClient) Candles(req *CandleRequest) (*CandlesResponse, error) {
-	url := fmt.Sprintf(url, req.Engine, req.Market, req.BoardGroupId, req.Security, req.Interval, req.Date, req.Date)
+	url := fmt.Sprintf(url, req.Engine, req.Market, req.BoardGroupId, req.Security, req.Interval, req.Date, req.Date, req.IsReverse)
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("create request error: %w", err)

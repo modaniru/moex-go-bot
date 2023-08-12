@@ -38,4 +38,5 @@ type CandleRequest struct {
 	Security     string
 	Date         string // YYYY-MM-DD
 	Interval     int    // 1, 10, 60
+	IsReverse bool
 }
