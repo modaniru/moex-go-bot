@@ -5,8 +5,8 @@ type CandlesResponse struct {
 }
 
 type Candles struct {
-	Metadata Metadata   `json:"metadata"`
-	Columns  []string   `json:"columns"`
+	Metadata Metadata        `json:"metadata"`
+	Columns  []string        `json:"columns"`
 	Data     [][]interface{} `json:"data"`
 }
 
@@ -38,5 +38,5 @@ type CandleRequest struct {
 	Security     string
 	Date         string // YYYY-MM-DD
 	Interval     int    // 1, 10, 60
-	IsReverse bool
+	IsReverse    bool
 }

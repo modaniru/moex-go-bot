@@ -30,24 +30,50 @@ func App() {
 		slog.Error("create bot api error", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+
 	slog.Info("Authorized on account " + botApi.Self.UserName)
-	slog.Info("create handler...")
 	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:1111/postgres?sslmode=disable")
 	if err != nil {
 		slog.Error("open db error", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+
+	err = db.Ping()
+	if err != nil {
+		slog.Error("ping db error", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	slog.Info("init gen.Queries...")
 	q := gen.New(db)
+
+	slog.Info("init http.Client...")
 	client := http.Client{}
+
+	slog.Info("init clients.MoexClient...")
 	moex := clients.NewMoexClient(&client)
+
+	slog.Info("init storage...")
 	storage := storage.NewStorage(db, q)
+
+	slog.Info("init service...")
 	s := service.NewService(moex, storage)
+
+	slog.Info("init handler...")
 	handler := handler.NewHandler(botApi, s)
+
+	slog.Info("init message sender...")
 	sender := telegram.NewMessageSender(botApi)
+
+	slog.Info("init notifier...")
 	notifier := notifier.NewNotifier(s.TrackService, sender)
-	slog.Info("handler created")
+
+	slog.Info("init bot server...")
 	botServer := bot.NewBot(botApi, handler)
+
+	slog.Info("start notifier...")
 	notifier.StartNotifier()
+
+	slog.Info("start bot server...")
 	botServer.Start()
 	slog.Error("bot was not up")
 }

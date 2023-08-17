@@ -22,7 +22,7 @@ func NewHandler(bot *tgbotapi.BotAPI, service *service.Service) *Handler {
 // TODO all text to consts
 func (h *Handler) HandleAction(update tgbotapi.Update) {
 	message := update.Message
-	if message == nil{
+	if message == nil {
 		return
 	}
 	ctx := context.WithValue(context.Background(), "id", message.From.ID)

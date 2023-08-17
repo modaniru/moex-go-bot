@@ -78,7 +78,7 @@ func (c *CandlesService) SaveTrack(params *entity.SaveTrack) (*entity.TrackRespo
 		}
 		sum += int(v)
 	}
-	median := int(float64(sum / (len(candles.Candles.Data) * params.Interval)) * params.Coefficient)
+	median := int(float64(sum/(len(candles.Candles.Data)*params.Interval)) * params.Coefficient)
 	err = c.storage.SaveTrack(context.Background(), gen.SaveTrackParams{
 		UserID:        int32(params.UserId),
 		Engine:        params.Engine,
@@ -92,37 +92,37 @@ func (c *CandlesService) SaveTrack(params *entity.SaveTrack) (*entity.TrackRespo
 		return nil, fmt.Errorf("save track error: %w", err)
 	}
 	return &entity.TrackResponse{
-		Median: median,
-		Security: params.Security,
+		Median:    median,
+		Security:  params.Security,
 		MaxVolume: int(max),
 		MinVolume: int(min),
-		Date: params.Date,
-		}, nil
+		Date:      params.Date,
+	}, nil
 }
 
-func (c *CandlesService) GetAllMustNotifiedTracks() ([]gen.GetAllMustNotifiedTracksRow, error){
+func (c *CandlesService) GetAllMustNotifiedTracks() ([]gen.GetAllMustNotifiedTracksRow, error) {
 	return c.storage.GetAllMustNotifiedTracks(context.Background())
 }
 
-type CandleResponse struct{
-	Open int
-	Close int
+type CandleResponse struct {
+	Open   int
+	Close  int
 	Volume int
 }
 
-func (c *CandlesService) GetCandle(row gen.GetAllMustNotifiedTracksRow) (*CandleResponse, error){
+func (c *CandlesService) GetCandle(row gen.GetAllMustNotifiedTracksRow) (*CandleResponse, error) {
 	resp, err := c.moexClient.Candles(
 		&clients.CandleRequest{
-			Engine: row.Engine,
-			Market: row.Market,
+			Engine:       row.Engine,
+			Market:       row.Market,
 			BoardGroupId: int(row.BoardGroup),
-			Security: row.Security,
-			Date: time.Now().Format("2006-01-02"),
-			Interval: 1,
-			IsReverse: true,
+			Security:     row.Security,
+			Date:         time.Now().Format("2006-01-02"),
+			Interval:     1,
+			IsReverse:    true,
 		},
 	)
-	if err != nil{
+	if err != nil {
 		return nil, fmt.Errorf("send request error: %w", err)
 	}
 	if len(resp.Candles.Data) == 0 {
@@ -131,21 +131,21 @@ func (c *CandlesService) GetCandle(row gen.GetAllMustNotifiedTracksRow) (*Candle
 	// TODO search by columns
 
 	volume, ok := resp.Candles.Data[0][5].(float64)
-	if !ok{
+	if !ok {
 		return nil, fmt.Errorf("conv value error")
 	}
 	open, ok := resp.Candles.Data[0][0].(float64)
-	if !ok{
+	if !ok {
 		return nil, fmt.Errorf("conv value error")
 	}
 	close, ok := resp.Candles.Data[0][1].(float64)
-	if !ok{
+	if !ok {
 		return nil, fmt.Errorf("conv value error")
 	}
 
 	return &CandleResponse{
 		Volume: int(volume),
-		Open: int(open),
-		Close: int(close),
+		Open:   int(open),
+		Close:  int(close),
 	}, nil
 }

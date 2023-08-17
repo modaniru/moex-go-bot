@@ -11,10 +11,10 @@ type SaveTrack struct {
 	Coefficient  float64
 }
 
-type TrackResponse struct{
-	Security string
-	Median int
+type TrackResponse struct {
+	Security  string
+	Median    int
 	MinVolume int
 	MaxVolume int
-	Date string
+	Date      string
 }

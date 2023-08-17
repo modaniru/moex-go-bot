@@ -71,7 +71,7 @@ func (h *Handler) AddSecurity(m *tgbotapi.Message) {
 		Security:     args[4],
 		Date:         args[5],
 		Interval:     10,
-		Coefficient: coefficent,
+		Coefficient:  coefficent,
 	})
 	if err != nil {
 		if errors.Is(err, services.ErrBadDay) {
