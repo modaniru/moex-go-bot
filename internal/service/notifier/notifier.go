@@ -30,9 +30,9 @@ const (
 )
 
 func (n *Notifier) StartNotifier() {
-	for time.Now().Second() > 5 {
+	for time.Now().Second() > 10 {
 		slog.Debug("we are trying to get closer to the exact data", slog.Int("delta from start minute in second", time.Now().Second()))
-		time.Sleep(3 * time.Second)
+		time.Sleep(7 * time.Second)
 	}
 	slog.Debug("success", slog.Int("delta from start minute in second", time.Now().Second()))
 	go func() {
