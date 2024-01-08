@@ -105,8 +105,8 @@ func (c *CandlesService) GetAllMustNotifiedTracks() ([]gen.GetAllMustNotifiedTra
 }
 
 type CandleResponse struct {
-	Open   int
-	Close  int
+	Open   float64
+	Close  float64
 	Volume int
 }
 
@@ -145,7 +145,18 @@ func (c *CandlesService) GetCandle(row gen.GetAllMustNotifiedTracksRow) (*Candle
 
 	return &CandleResponse{
 		Volume: int(volume),
-		Open:   int(open),
-		Close:  int(close),
+		Open:   open,
+		Close:  close,
 	}, nil
 }
+
+// type TrackCandleResponse struct {
+// 	trackedVolume int
+// 	engine        string
+// 	market        string
+// 	boardGroup
+// }
+
+// func (c *CandlesService) GetUsersCandles(userId int) []{
+
+// }

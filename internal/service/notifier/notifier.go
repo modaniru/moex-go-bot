@@ -25,8 +25,8 @@ func NewNotifier(candles service.TrackService, message *telegram.MessageSender) 
 }
 
 const (
-	up   = "↗️"
-	down = "↘️"
+	up   = "🟢"
+	down = "🔴"
 )
 
 func (n *Notifier) StartNotifier() {
@@ -57,7 +57,7 @@ func (n *Notifier) StartNotifier() {
 					if candle.Open > candle.Close {
 						s = down
 					}
-					n.sender.SendMessage(fmt.Sprintf("volume по бумаге %s превышает %d, сейчас %d. status %s", row.Security, row.TrackedVolume, candle.Volume, s), int(row.ID))
+					n.sender.SendMessage(fmt.Sprintf("%s объем операция по %s превышает %d, сейчас %d.\n\nopen: %.2f\nclose: %.2f", s, row.Security, row.TrackedVolume, candle.Volume, candle.Open, candle.Close), int(row.ID))
 				}
 
 			}
